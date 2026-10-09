@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 from glob import glob
 import os
 
-package_name = 'ros2_py_template'
+package_name = 'bog_yz5'
 
 setup(
     name=package_name,
@@ -16,14 +16,15 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='todo',
-    maintainer_email='todo@todo.com',
-    description='TODO: Package description',
+    maintainer='bog_yz5',
+    maintainer_email='bogjos.kevin@gmail.com',
+    description='Autonóm Vészfék szimuláció és vezérlő - kis beadandó az AJR tantárgyhoz',
     license='GNU General Public License v3.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            # 'control_vehicle = ros2_py_template.control_vehicle:main',
+            'gen_range_twist = bog_yz5.gen_range_twist:main',
+            'control_node = bog_yz5.control_node:main',
         ],
     },
 )
