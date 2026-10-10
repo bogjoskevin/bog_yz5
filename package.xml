@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>bog_yz5</name>
-  <version>0.0.3</version>
+  <version>0.1.0</version>
   <description>Autonóm Vészfék szimuláció és vezérlő - kis beadandó az AJR tantárgyhoz</description>
   <maintainer email="bogjos.kevin@gmail.com">bog_yz5</maintainer>
   <license>GNU General Public License v3.0</license>

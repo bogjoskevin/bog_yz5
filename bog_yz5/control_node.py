@@ -18,6 +18,7 @@ class ControlNode(Node):
         self.range_val_ = 20.0
         self.speed_val_ = 0.0
         self.angular_val_ = 0.0
+        self.emergency_stop_ = False
 
         self.get_logger().info('control_node elindult és figyeli a szenzoradatokat.')
 
@@ -31,8 +32,9 @@ class ControlNode(Node):
     def timer_callback(self):
         cmd = Twist()
 
-        # 1. Veszfek (< 5m)
+        # Veszfek (< 5m)
         if self.range_val_ < 5.0:
+            self.emergency_stop_ = True
             cmd.linear.x = 0.0
             cmd.angular.z = 0.0
             self.pub_cmd_.publish(cmd)
@@ -40,7 +42,25 @@ class ControlNode(Node):
                 f'CRITICAL: Obstacle detected (Range: {self.range_val_:.2f} m < 5.0 m), EMERGENCY BRAKE active!'
             )
 
-        # 2. Lassitas (5m - 10m)
+        # Veszfek utan addig nem indul el, amig nem tiszta teljesen az ut (>= 10m)
+        elif self.emergency_stop_:
+            if self.range_val_ >= 10.0:
+                self.emergency_stop_ = False
+                cmd.linear.x = self.speed_val_
+                cmd.angular.z = self.angular_val_
+                self.pub_cmd_.publish(cmd)
+                self.get_logger().info(
+                    f'NORMAL: Path clear (Range: {self.range_val_:.2f} m), moving robot with speed {self.speed_val_:.2f} m/s.'
+                )
+            else:
+                cmd.linear.x = 0.0
+                cmd.angular.z = 0.0
+                self.pub_cmd_.publish(cmd)
+                self.get_logger().warn(
+                    f'HOLDING BRAKE: Obstacle still near (Range: {self.range_val_:.2f} m), waiting...'
+                )
+
+        # Lassitas (5m - 10m)
         elif 5.0 <= self.range_val_ < 10.0:
             cmd.linear.x = float(self.speed_val_ * 0.4)
             cmd.angular.z = self.angular_val_
@@ -49,7 +69,7 @@ class ControlNode(Node):
                 f'WARNING: Obstacle approaching (Range: {self.range_val_:.2f} m), decelerating to {cmd.linear.x:.2f} m/s.'
             )
 
-        # 3. Normal haladas (>= 10m)
+        # Normal haladas (>= 10m)
         else:
             cmd.linear.x = self.speed_val_
             cmd.angular.z = self.angular_val_
